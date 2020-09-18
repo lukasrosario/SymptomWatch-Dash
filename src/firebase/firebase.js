@@ -19,8 +19,6 @@ export default class Firebase {
 
   isAuthenticated = async () => {
     const user = await this.auth().currentUser;
-    console.log(user);
-    const ret = user == null ? false : true;
     return user == null ? false : true;
   };
 
@@ -32,6 +30,10 @@ export default class Firebase {
     } catch {
       console.log('auth error');
     }
+  };
+
+  signOut = async () => {
+    this.auth().signOut();
   };
 
   authSubscriber = (callback) => {

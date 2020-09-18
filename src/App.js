@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import './tailwind.output.css';
 import {
   BrowserRouter as Router,
@@ -7,40 +7,36 @@ import {
   Redirect
 } from 'react-router-dom';
 import PrivateRoute from './components/PrivateRoute';
-import Loading from './pages/Loading';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
-import { withFirebase } from './firebase';
+import Loading from './pages/Loading';
+import { AuthContext } from './firebase';
 
-const App = ({ firebase }) => {
+const App = () => {
   const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState();
+  const user = useContext(AuthContext);
 
-  function onAuthStateChanged(user) {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  }
+  setTimeout(() => {
+    setInitializing(false);
+  }, 1000);
 
-  useEffect(() => {
-    const subsriber = firebase.authSubscriber(onAuthStateChanged);
-    return subsriber;
-  }, []);
-
-  if (initializing) {
+  if (initializing && user == null) {
     return <Loading />;
   }
-
-  console.log(user);
 
   return (
     <Router>
       <Switch>
         <Route exact path="/" render={() => <Redirect to="/dashboard" />} />
-        <Route exact path="/login" component={Login} />
+        <Route
+          exact
+          path="/login"
+          render={() => (user ? <Redirect to="dashboard" /> : <Login />)}
+        />
         <PrivateRoute exact path="/dashboard" component={Dashboard} />
       </Switch>
     </Router>
   );
 };
 
-export default withFirebase(App);
+export default App;
