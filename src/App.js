@@ -1,26 +1,46 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import './tailwind.output.css';
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect
+} from 'react-router-dom';
+import PrivateRoute from './components/PrivateRoute';
+import Loading from './pages/Loading';
+import Dashboard from './pages/Dashboard';
+import Login from './pages/Login';
+import { withFirebase } from './firebase';
 
-function App() {
+const App = ({ firebase }) => {
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState();
+
+  function onAuthStateChanged(user) {
+    setUser(user);
+    if (initializing) setInitializing(false);
+  }
+
+  useEffect(() => {
+    const subsriber = firebase.authSubscriber(onAuthStateChanged);
+    return subsriber;
+  }, []);
+
+  if (initializing) {
+    return <Loading />;
+  }
+
+  console.log(user);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Switch>
+        <Route exact path="/" render={() => <Redirect to="/dashboard" />} />
+        <Route exact path="/login" component={Login} />
+        <PrivateRoute exact path="/dashboard" component={Dashboard} />
+      </Switch>
+    </Router>
   );
-}
+};
 
-export default App;
+export default withFirebase(App);
