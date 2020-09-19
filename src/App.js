@@ -18,7 +18,7 @@ const App = () => {
 
   setTimeout(() => {
     setInitializing(false);
-  }, 1000);
+  }, 3000);
 
   if (initializing && user == null) {
     return <Loading />;
