@@ -1,19 +1,16 @@
 import React, { useState } from 'react';
-import Tabs from './Tabs';
-import Inventory from './Inventory';
-import Search from './Search';
-import FilterButton from './FilterButton';
+import Users from './Users';
+import SignOutButton from './SignOutButton';
 
 const Manager = () => {
-  const [active, setActive] = useState('inventory');
+  const [active, setActive] = useState('allUsers');
 
   return (
     <div className="flex flex-col w-11/12 px-4 overflow-hidden">
-      <div className="flex flex-row justify-around py-4">
-        <Search />
-        <FilterButton />
+      <div className="w-full flex flex-row justify-end items-center mb-4">
+        <SignOutButton />
       </div>
-      <Inventory active={active} />
+      <Users active={active} />
     </div>
   );
 };

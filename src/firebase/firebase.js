@@ -1,5 +1,6 @@
 import app from 'firebase/app';
 import 'firebase/auth';
+import 'firebase/firestore';
 
 const config = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -15,6 +16,7 @@ export default class Firebase {
   constructor() {
     app.initializeApp(config);
     this.auth = app.auth;
+    this.db = app.firestore();
   }
 
   isAuthenticated = async () => {
@@ -38,5 +40,21 @@ export default class Firebase {
 
   authSubscriber = (callback) => {
     return this.auth().onAuthStateChanged(callback);
+  };
+
+  fetchUsers = async () => {
+    const users = await this.db
+      .collection('Users')
+      .get()
+      .then((querySnapshot) => {
+        let usersSnapshot = querySnapshot.docs;
+        usersSnapshot = usersSnapshot.map((userDoc) => {
+          userDoc = userDoc.data();
+          userDoc.lastUpload = userDoc.lastUpload.toDate().toDateString();
+          return userDoc;
+        });
+        return usersSnapshot;
+      });
+    return users;
   };
 }
